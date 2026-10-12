@@ -67,5 +67,13 @@
     "typescript": "^5.9",
     "vite": "^8.3.4",
     "vite-plugin-dts": "^5.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wahabshaikh/goo-buddies.git"
+  },
+  "homepage": "https://goo-buddies.wahabshaikh.workers.dev",
+  "bugs": {
+    "url": "https://github.com/wahabshaikh/goo-buddies/issues"
   }
 }
