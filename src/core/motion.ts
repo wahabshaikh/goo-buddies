@@ -63,8 +63,8 @@ export function computeTargets(
   const pulse = pose.pulse * talk;
   const hop = hopState(t, pose.hopRate, pose.hop);
 
-  let sy = pose.scaleY * breathe * (1 + pulse) * hop.stretch * (1 - 0.56 * pose.melt);
-  let sx = (pose.scaleX * (1 + pulse * 0.5) * (1 + 0.5 * pose.melt)) / Math.sqrt(breathe * hop.stretch);
+  let sy = pose.scaleY * breathe * (1 + pulse) * hop.stretch * (1 - 0.48 * pose.melt);
+  let sx = (pose.scaleX * (1 + pulse * 0.5) * (1 + 0.4 * pose.melt)) / Math.sqrt(breathe * hop.stretch);
   sy = Math.max(sy, 0.2);
   sx = Math.max(sx, 0.2);
 

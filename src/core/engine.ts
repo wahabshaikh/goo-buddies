@@ -338,7 +338,7 @@ export class GooEngine {
         vx: 0,
         vy: -(0.32 + r() * 0.3),
         life: 6,
-        size: 0.03 + r() * 0.05,
+        size: 0.05 + r() * 0.06,
         spin: r() * TAU,
       });
     }
@@ -356,7 +356,7 @@ export class GooEngine {
         vx: body.nx[i] * speed,
         vy: body.ny[i] * speed - 1.3,
         life: 3,
-        size: 0.035 + r() * 0.05,
+        size: 0.06 + r() * 0.06,
       });
     }
     e.zees += rates.zees * adt;
@@ -369,7 +369,7 @@ export class GooEngine {
         vx: 0.14,
         vy: -0.3,
         life: 3.4,
-        size: 0.09,
+        size: 0.13,
         spin: r() * TAU,
       });
     }
@@ -383,7 +383,7 @@ export class GooEngine {
         vx: 0,
         vy: -0.15,
         life: 0.8,
-        size: 0.06 + r() * 0.06,
+        size: 0.1 + r() * 0.08,
         spin: r() * TAU,
       });
     }
@@ -420,7 +420,7 @@ export class GooEngine {
           q.spin += adt * 1.6;
           q.x += (q.vx + Math.sin(q.spin) * 0.12) * adt;
           q.y += q.vy * adt;
-          q.size = 0.09 + 0.07 * (q.age / q.life);
+          q.size = 0.13 + 0.1 * (q.age / q.life);
           break;
         case ParticleKind.Sparkle:
           q.y += q.vy * adt;
@@ -486,10 +486,12 @@ export class GooEngine {
     ctx.fillRect(b.minX - 1, b.minY - 1, w + 2, h + 2);
     // A denser core, seen through the jelly.
     if (look.core > 0) {
-      ctx.fillStyle = toCss(darken(color, 0.2), look.core);
-      ctx.beginPath();
-      ctx.ellipse(b.cx, b.maxY - h * 0.38, w * 0.3, h * 0.24, 0, 0, TAU);
-      ctx.fill();
+      const cy = b.maxY - h * 0.4;
+      const core = ctx.createRadialGradient(b.cx, cy, 0, b.cx, cy, Math.max(w, h) * 0.42);
+      core.addColorStop(0, toCss(darken(color, 0.18), look.core));
+      core.addColorStop(1, toCss(darken(color, 0.18), 0));
+      ctx.fillStyle = core;
+      ctx.fillRect(b.minX - 1, b.minY - 1, w + 2, h + 2);
     }
     // Sugar-dusted gummy.
     if (material === 'gummy') {
@@ -612,7 +614,7 @@ export class GooEngine {
 
   private drawInnerParticles(ctx: CanvasRenderingContext2D, color: RGB): void {
     const rim = toCss(lighten(color, 0.75), 0.75);
-    const fill = toCss(lighten(color, 0.6), 0.18);
+    const fill = toCss(lighten(color, 0.6), 0.3);
     for (const q of this.particles) {
       if (q.kind === ParticleKind.Bubble) {
         const grow = clamp(q.age / 0.3, 0, 1);
@@ -621,7 +623,7 @@ export class GooEngine {
         ctx.arc(q.x, q.y, r, 0, TAU);
         ctx.fillStyle = fill;
         ctx.fill();
-        ctx.lineWidth = 0.012;
+        ctx.lineWidth = 0.018;
         ctx.strokeStyle = rim;
         ctx.stroke();
         ctx.fillStyle = 'rgba(255,255,255,0.8)';
@@ -697,7 +699,7 @@ export class GooEngine {
         ctx.save();
         ctx.translate(q.x, q.y);
         ctx.rotate(q.spin * 0.3);
-        ctx.fillStyle = toCss(lighten(color, 0.75), a);
+        ctx.fillStyle = `rgba(255,236,150,${a})`;
         ctx.beginPath();
         for (let k = 0; k < 8; k++) {
           const ang = (k / 8) * TAU;
@@ -719,16 +721,22 @@ export class GooEngine {
     const squash = Math.sqrt(clamp(h / o.height, 0.5, 1.2));
     const gx = clamp(this.gazeX, -1.2, 1.2);
     const gy = clamp(this.gazeY, -1.2, 1.2);
-    const fx = lerp(b.cx, (b.minX + b.maxX) / 2, 0.5) + gx * 0.08;
-    const fy = b.maxY - h * o.faceHeight + gy * 0.06;
+    const fx = lerp(b.cx, (b.minX + b.maxX) / 2, 0.5) + gx * 0.11;
+    const fy = b.maxY - h * o.faceHeight + gy * 0.08;
     const spacing = 0.34 * clamp(w, 0.7, 1.45) ** 0.8;
     const eyeR = 0.125 * clamp(Math.sqrt(w), 0.85, 1.2);
 
     const react = this.reaction;
-    const happy = clamp(p.eyeHappy + react * 0.9, 0, 1);
-    const cross = clamp(p.eyeCross * (1 - react), 0, 1);
-    const closed = clamp(p.eyeClosed * (1 - react), 0, 1);
-    const round = clamp(1 - happy - cross - closed, 0, 1);
+    // Eye styles cross-fade through a closed moment: round eyes fade out over the
+    // first half of a change, the new style fades in over the second.
+    const fadeIn = (w: number) => clamp(2 * w - 1, 0, 1);
+    const happyW = clamp(p.eyeHappy + react, 0, 1);
+    const crossW = clamp(p.eyeCross * (1 - react), 0, 1);
+    const closedW = clamp(p.eyeClosed * (1 - react), 0, 1);
+    const round = clamp(1 - 2 * (happyW + crossW + closedW), 0, 1);
+    const happy = fadeIn(happyW);
+    const cross = fadeIn(crossW);
+    const closed = fadeIn(closedW);
     let blink = 1;
     if (this.blinkT >= 0) blink = 1 - Math.sin(Math.PI * clamp(this.blinkT / 0.16, 0, 1));
 
@@ -745,8 +753,8 @@ export class GooEngine {
     ctx.strokeStyle = ink;
     ctx.fillStyle = ink;
     for (const side of [-1, 1]) {
-      const ex = fx + side * spacing + gx * 0.04;
-      const ey = fy + gy * 0.035;
+      const ex = fx + side * spacing + gx * 0.05;
+      const ey = fy + gy * 0.05;
       if (round > 0.02) {
         const open = clamp(p.eyeOpen, 0, 1.2) * blink;
         const ry = eyeR * squash * Math.max(open, 0.08) * (0.7 + 0.3 * round);
@@ -757,7 +765,7 @@ export class GooEngine {
         if (open > 0.35) {
           ctx.fillStyle = 'rgba(255,255,255,0.9)';
           ctx.beginPath();
-          ctx.arc(ex - eyeR * 0.28 + gx * eyeR * 0.15, ey - ry * 0.4 + gy * eyeR * 0.1, eyeR * 0.26, 0, TAU);
+          ctx.arc(ex - eyeR * 0.25 + gx * eyeR * 0.3, ey - ry * 0.38 + gy * ry * 0.3, eyeR * 0.26, 0, TAU);
           ctx.fill();
           ctx.fillStyle = ink;
         }
@@ -789,7 +797,7 @@ export class GooEngine {
     }
 
     // Mouth.
-    const mw = 0.15 * p.mouthWidth * clamp(w, 0.7, 1.4) ** 0.7;
+    const mw = 0.19 * p.mouthWidth * clamp(w, 0.7, 1.4) ** 0.7;
     const mx = fx + gx * 0.05;
     const my = Math.min(fy + eyeR * 1.75, b.maxY - 0.1);
     const talk = p.talk > 0.01 ? p.talk * talkSignal(this.time + this.phase * 10, 5) : 0;

@@ -213,6 +213,8 @@ export function approachPose(current: Pose, target: Readonly<Pose>, rate: number
 export function stillPose(pose: Readonly<Pose>): Pose {
   return {
     ...pose,
+    // A talking mouth is caught mid-word.
+    mouthOpen: pose.mouthOpen + pose.talk * 0.45,
     breathe: 0,
     sway: 0,
     hop: 0,
