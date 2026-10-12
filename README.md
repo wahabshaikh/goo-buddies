@@ -12,7 +12,7 @@ npm install goo-buddies
 
 **[Try the live playground →](https://goo-buddies.wahabshaikh.workers.dev)**
 
-Squishy soft-body slime buddies for React that show what your AI agent is doing. Each buddy is a blob of goo with a face. It thinks, searches, listens, speaks, works, celebrates, errors and sleeps, and it dents when you poke it and stretches when you drag it.
+Each buddy is a blob of goo with a face. It thinks, searches, listens, speaks, works, celebrates, errors and sleeps, and it dents when you poke it and stretches when you drag it.
 
 The buddies are drawn on a 2D canvas and moved by spring-mass (verlet) physics. There's no WebGL and no runtime dependencies.
 
