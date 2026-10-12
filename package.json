@@ -1,0 +1,71 @@
+{
+  "name": "goo-buddies",
+  "version": "0.1.0",
+  "description": "Squishy soft-body slime buddies for React that show what your AI agent is doing: thinking, searching, listening, speaking and more. 2D canvas, spring-mass physics, no WebGL, zero runtime dependencies.",
+  "keywords": [
+    "react",
+    "slime",
+    "jelly",
+    "blob",
+    "soft-body",
+    "physics",
+    "avatar",
+    "agent",
+    "ai",
+    "animation",
+    "canvas",
+    "mascot",
+    "llm",
+    "chatbot",
+    "status"
+  ],
+  "license": "MIT",
+  "author": "Wahab Shaikh",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "workspaces": [
+    "site"
+  ],
+  "scripts": {
+    "dev": "bun run --cwd site dev",
+    "build": "vite build && cp dist/index.d.ts dist/index.d.cts",
+    "build:site": "bun run --cwd site build",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit && bun run --cwd site typecheck",
+    "prepublishOnly": "bun run typecheck && bun test && bun run build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.59.4",
+    "@types/bun": "^1.4.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "typescript": "^5.9",
+    "vite": "^8.3.4",
+    "vite-plugin-dts": "^5.1.2"
+  }
+}
